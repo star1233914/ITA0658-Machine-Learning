@@ -1,0 +1,60 @@
+import numpy as np
+
+# Sigmoid Activation Function and Derivative
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+# Training Data (XOR Dataset)
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])  # Inputs
+y = np.array([[0], [1], [1], [0]])  # Expected Output
+
+# Initialize Neural Network Parameters
+input_neurons = 2
+hidden_neurons = 2
+output_neurons = 1
+learning_rate = 0.5
+
+# Random Weight Initialization
+np.random.seed(1)
+weights_input_hidden = np.random.uniform(-1, 1, (input_neurons, hidden_neurons))
+weights_hidden_output = np.random.uniform(-1, 1, (hidden_neurons, output_neurons))
+bias_hidden = np.random.uniform(-1, 1, (1, hidden_neurons))
+bias_output = np.random.uniform(-1, 1, (1, output_neurons))
+
+# Training the Neural Network
+epochs = 10000
+for epoch in range(epochs):
+    # Forward Pass
+    hidden_layer_input = np.dot(X, weights_input_hidden) + bias_hidden
+    hidden_layer_output = sigmoid(hidden_layer_input)
+
+    final_layer_input = np.dot(hidden_layer_output, weights_hidden_output) + bias_output
+    final_output = sigmoid(final_layer_input)
+
+    # Compute Error
+    error = y - final_output
+
+    # Backward Pass
+    output_gradient = error * sigmoid_derivative(final_output)
+    hidden_gradient = output_gradient.dot(weights_hidden_output.T) * sigmoid_derivative(hidden_layer_output)
+
+    # Update Weights and Biases
+    weights_hidden_output += hidden_layer_output.T.dot(output_gradient) * learning_rate
+    bias_output += np.sum(output_gradient, axis=0, keepdims=True) * learning_rate
+    weights_input_hidden += X.T.dot(hidden_gradient) * learning_rate
+    bias_hidden += np.sum(hidden_gradient, axis=0, keepdims=True) * learning_rate
+
+    # Print Error Every 1000 Iterations
+    if epoch % 1000 == 0:
+        print(f"Epoch {epoch}, Error: {np.mean(np.abs(error))}")
+
+# Test the ANN with the XOR Dataset
+print("\nFinal Predictions:")
+for i in range(len(X)):
+    hidden_layer_input = np.dot(X[i], weights_input_hidden) + bias_hidden
+    hidden_layer_output = sigmoid(hidden_layer_input)
+    final_output = sigmoid(np.dot(hidden_layer_output, weights_hidden_output) + bias_output)
+    print(f"Input: {X[i]} -> Predicted Output: {final_output[0][0]:.4f}")
