@@ -1,0 +1,45 @@
+import pandas as pd
+
+# Candidate-Elimination Algorithm
+def candidate_elimination_algorithm(data):
+    num_attributes = len(data[0]) - 1  # Exclude the class label
+    S = data[0][:-1]  # Initialize S with the first positive example
+    G = [["?"] * num_attributes]  # Initialize G with the most general hypothesis
+
+    for example in data:
+        attributes = example[:-1]
+        label = example[-1]
+
+        if label == "Yes":  # Positive Example
+            # Generalize S if needed
+            for i in range(num_attributes):
+                if attributes[i] != S[i]:
+                    S[i] = "?"
+            # Remove inconsistent hypotheses from G
+            G = [g for g in G if all(g[i] == "?" or g[i] == attributes[i] for i in range(num_attributes))]
+
+        elif label == "No":  # Negative Example
+            # Specialize G if needed
+            new_G = []
+            for g in G:
+                for i in range(num_attributes):
+                    if g[i] == "?":
+                        specialized_hypothesis = g[:]
+                        specialized_hypothesis[i] = S[i]
+                        new_G.append(specialized_hypothesis)
+            G = new_G
+
+    return S, G
+
+# Read training data from CSV file
+df = pd.read_csv("training_data.csv")  # Ensure the file is in the same directory
+
+# Convert data to list format
+data = df.values.tolist()
+
+# Apply Candidate-Elimination Algorithm
+S_final, G_final = candidate_elimination_algorithm(data)
+
+# Print the final hypotheses
+print("Final Specific Hypothesis (S):", S_final)
+print("Final General Hypothesis Set (G):", G_final)
