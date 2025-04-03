@@ -1,0 +1,32 @@
+import pandas as pd
+
+# FIND-S Algorithm
+def find_s_algorithm(training_data):
+    # Initialize hypothesis with the first positive example
+    hypothesis = training_data[0][:-1]  # Exclude the class label
+    
+    # Iterate through the training data
+    for example in training_data:
+        if example[-1] == "Yes":  # Consider only positive examples
+            for i in range(len(hypothesis)):
+                if example[i] != hypothesis[i]:
+                    hypothesis[i] = "?"  # Generalize hypothesis
+                
+    return hypothesis
+
+# Sample training data
+data = [
+    ["Sunny", "Warm", "Normal", "Strong", "Warm", "Same", "Yes"],
+    ["Sunny", "Warm", "High", "Strong", "Warm", "Same", "Yes"],
+    ["Rainy", "Cold", "High", "Strong", "Warm", "Change", "No"],
+    ["Sunny", "Warm", "High", "Strong", "Cool", "Change", "Yes"]
+]
+
+# Convert data to DataFrame
+df = pd.DataFrame(data, columns=["Sky", "Temp", "Humidity", "Wind", "Water", "Forecast", "Class"])
+
+# Apply FIND-S algorithm
+hypothesis = find_s_algorithm(df.values.tolist())
+
+# Print output
+print("Final Hypothesis:", hypothesis)
