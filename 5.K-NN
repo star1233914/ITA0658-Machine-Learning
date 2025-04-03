@@ -1,0 +1,50 @@
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+# Sample Dataset: Iris (using a small subset)
+data = {
+    "Feature1": [5.1, 4.9, 6.2, 5.5, 6.7, 5.0, 5.7, 6.0, 6.5, 5.8],
+    "Feature2": [3.5, 3.0, 3.4, 2.3, 3.1, 3.6, 2.8, 2.2, 3.0, 2.7],
+    "Feature3": [1.4, 1.4, 5.4, 4.0, 5.6, 1.4, 4.5, 5.0, 5.8, 5.1],
+    "Feature4": [0.2, 0.2, 2.3, 1.3, 2.4, 0.2, 1.3, 1.5, 2.2, 1.9],
+    "Class": ["Setosa", "Setosa", "Virginica", "Versicolor", "Virginica",
+              "Setosa", "Versicolor", "Virginica", "Virginica", "Versicolor"]
+}
+
+# Convert to DataFrame
+df = pd.DataFrame(data)
+
+# Split data into features and target
+X = df.iloc[:, :-1]  # Features
+y = df["Class"]       # Target labels
+
+# Split data into training and testing sets (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+
+# Feature Scaling (optional but improves accuracy)
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Initialize K-NN Classifier with K=3
+knn = KNeighborsClassifier(n_neighbors=3)
+knn.fit(X_train, y_train)
+
+# Predict on test data
+y_pred = knn.predict(X_test)
+
+# Evaluate model
+accuracy = accuracy_score(y_test, y_pred)
+print("Predictions:", y_pred)
+print("Actual:", y_test.values)
+print("Accuracy:", accuracy)
+
+# Classify a new sample
+new_sample = np.array([[5.9, 3.0, 4.2, 1.5]])  # Example data point
+new_sample_scaled = scaler.transform(new_sample)  # Scale the input
+prediction = knn.predict(new_sample_scaled)
+print("\nNew Sample Prediction:", prediction[0])
