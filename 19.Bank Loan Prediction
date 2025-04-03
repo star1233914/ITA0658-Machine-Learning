@@ -1,0 +1,44 @@
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+# Sample dataset (Features: Income ($), Credit Score, Loan Amount ($), Employment (1=Yes, 0=No) | Target: Loan Approved (1=Yes, 0=No))
+data = {
+    "Income": [30000, 50000, 80000, 25000, 60000, 75000, 40000, 90000, 100000, 55000],
+    "Credit Score": [600, 700, 750, 580, 720, 680, 640, 780, 800, 670],
+    "Loan Amount": [10000, 20000, 30000, 7000, 25000, 28000, 15000, 35000, 40000, 22000],
+    "Employment": [1, 1, 1, 0, 1, 1, 0, 1, 1, 1],
+    "Loan Approved": [0, 1, 1, 0, 1, 1, 0, 1, 1, 1]
+}
+
+# Convert to DataFrame
+df = pd.DataFrame(data)
+
+# Split data into features (X) and target (y)
+X = df.iloc[:, :-1]  # Features
+y = df["Loan Approved"]  # Target variable
+
+# Split into training (80%) and testing (20%)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+
+# Initialize and train Naïve Bayes model
+model = GaussianNB()
+model.fit(X_train, y_train)
+
+# Predict on test data
+y_pred = model.predict(X_test)
+
+# Compute accuracy and confusion matrix
+accuracy = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+
+# Display results
+print("Confusion Matrix:\n", conf_matrix)
+print("Accuracy:", accuracy)
+
+# Predict loan approval for a new applicant
+new_applicant = np.array([[70000, 710, 26000, 1]])  # Example input
+prediction = model.predict(new_applicant.reshape(1, -1))
+print("\nLoan Approval Prediction (1=Approved, 0=Not Approved):", prediction[0])
