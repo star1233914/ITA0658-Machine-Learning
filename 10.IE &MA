@@ -1,0 +1,26 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.mixture import GaussianMixture
+
+# Generate synthetic dataset (2 clusters)
+np.random.seed(42)
+X1 = np.random.normal(loc=5, scale=1.5, size=(100, 1))  # Cluster 1
+X2 = np.random.normal(loc=10, scale=1.2, size=(100, 1)) # Cluster 2
+X = np.vstack((X1, X2))  # Combine clusters
+
+# Fit Gaussian Mixture Model (EM Algorithm)
+gmm = GaussianMixture(n_components=2, max_iter=100, random_state=42)
+gmm.fit(X)
+
+# Predict cluster labels
+labels = gmm.predict(X)
+
+# Plot results
+plt.scatter(X, np.zeros_like(X), c=labels, cmap='viridis', s=30)
+plt.xlabel("Data Points")
+plt.title("Clustering using Expectation-Maximization (EM Algorithm)")
+plt.show()
+
+# Display Results
+print("Means of Clusters:", gmm.means_.flatten())
+print("Covariances of Clusters:", gmm.covariances_.flatten())
