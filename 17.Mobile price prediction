@@ -1,0 +1,53 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Sample dataset (Features: RAM (GB), Battery (mAh), Storage (GB), Camera (MP) | Target: Price ($))
+data = {
+    "RAM": [4, 6, 8, 12, 4, 8, 6, 12, 16, 8],
+    "Battery": [4000, 4500, 5000, 4500, 4000, 5000, 4300, 4800, 5000, 4700],
+    "Storage": [64, 128, 256, 128, 64, 256, 128, 512, 512, 256],
+    "Camera": [12, 48, 64, 108, 16, 64, 32, 108, 200, 64],
+    "Price": [250, 350, 500, 600, 280, 520, 400, 700, 900, 550]
+}
+
+# Convert to DataFrame
+df = pd.DataFrame(data)
+
+# Split data into features (X) and target (y)
+X = df.iloc[:, :-1]  # Features
+y = df["Price"]  # Target variable
+
+# Split into training (80%) and testing (20%)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+
+# Initialize and train Random Forest model
+model = RandomForestRegressor(n_estimators=100, random_state=1)
+model.fit(X_train, y_train)
+
+# Predict on test data
+y_pred = model.predict(X_test)
+
+# Compute performance metrics
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+# Display results
+print("Mean Squared Error:", mse)
+print("R-Squared Score:", r2)
+
+# Predict price for a new mobile
+new_mobile = np.array([[8, 4500, 128, 48]])  # Example input
+predicted_price = model.predict(new_mobile.reshape(1, -1))
+print("\nPredicted Price for New Mobile: $", round(predicted_price[0], 2))
+
+# Plot actual vs predicted prices
+plt.scatter(y_test, y_pred, color="blue")
+plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], linestyle='--', color='red')
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title("Actual vs Predicted Mobile Prices")
+plt.show()
