@@ -1,0 +1,38 @@
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier, export_text
+
+# Load dataset (Example: Weather dataset)
+data = {
+    "Sky": ["Sunny", "Sunny", "Overcast", "Rainy", "Rainy", "Rainy", "Overcast", "Sunny", "Sunny", "Rainy", "Sunny", "Overcast", "Overcast", "Rainy"],
+    "Temp": ["Hot", "Hot", "Hot", "Mild", "Cool", "Cool", "Cool", "Mild", "Cool", "Mild", "Mild", "Mild", "Hot", "Mild"],
+    "Humidity": ["High", "High", "High", "High", "Normal", "Normal", "Normal", "High", "Normal", "Normal", "Normal", "High", "Normal", "High"],
+    "Wind": ["Weak", "Strong", "Weak", "Weak", "Weak", "Strong", "Strong", "Weak", "Weak", "Weak", "Strong", "Strong", "Weak", "Strong"],
+    "Play": ["No", "No", "Yes", "Yes", "Yes", "No", "Yes", "No", "Yes", "Yes", "Yes", "Yes", "Yes", "No"]
+}
+
+# Convert dataset to DataFrame
+df = pd.DataFrame(data)
+
+# Encode categorical variables as numbers
+df_encoded = df.apply(lambda col: col.astype('category').cat.codes)
+
+# Split features and target variable
+X = df_encoded.iloc[:, :-1]  # Features
+y = df_encoded["Play"]        # Target (Play: Yes=1, No=0)
+
+# Train Decision Tree Model
+model = DecisionTreeClassifier(criterion="entropy")  # Using ID3 (Entropy)
+model.fit(X, y)
+
+# Display the trained decision tree
+tree_rules = export_text(model, feature_names=list(X.columns))
+print("Decision Tree Rules:\n", tree_rules)
+
+# Classify a new sample
+new_sample = pd.DataFrame([["Sunny", "Cool", "High", "Strong"]], columns=["Sky", "Temp", "Humidity", "Wind"])
+new_sample_encoded = new_sample.apply(lambda col: col.astype('category').cat.codes)
+prediction = model.predict(new_sample_encoded)
+
+# Output classification result
+print("\nNew Sample:", new_sample.values[0])
+print("Prediction (Play?):", "Yes" if prediction[0] == 1 else "No")
